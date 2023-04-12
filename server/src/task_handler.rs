@@ -109,4 +109,21 @@ impl<'a> TaskHandler<'a> {
             false => log::error!("Could not find section: {}", section_name),
         }
     }
+
+    pub fn remove_section(&mut self, section_name: &'a str) {
+        let current_section_name = match &self.current_section {
+            Some(v) => v,
+            None => {
+                log::error!("Please select a section");
+                return;
+            }
+        };
+
+        if self.sections.get(current_section_name.as_str()).is_none() {
+            log::error!("Could not find section: {}", current_section_name.as_str());
+            return;
+        };
+
+        self.sections.remove(section_name);
+    }
 }
