@@ -19,7 +19,14 @@ pub struct Task {
 
 impl<'a> TaskHandler<'a> {
     pub fn add_section(&mut self, section_name: &'a str) {
-        self.sections.insert(section_name, Section::default());
+        match self.sections.contains_key(section_name) {
+            true => {
+                log::error!("Could not add section, already exists: {section_name}");
+                return;
+            }
+
+            false => self.sections.insert(section_name, Section::default()),
+        };
     }
 
     pub fn add_task(&mut self, task_name: &'a str, task_description: &'a str, completed: bool) {
