@@ -11,7 +11,7 @@ pub struct Section<'a> {
     pub tasks: HashMap<&'a str, Task>,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Task {
     pub description: String,
     pub completed: bool,
