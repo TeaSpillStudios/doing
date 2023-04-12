@@ -95,4 +95,11 @@ impl<'a> TaskHandler<'a> {
 
         return section.tasks.values().any(|t| t.completed != true);
     }
+
+    pub fn select_section(&mut self, section_name: &'a str) {
+        match self.sections.contains_key(section_name) {
+            true => self.current_section = Some(section_name.to_string()),
+            false => log::error!("Could not find section: {}", section_name),
+        }
+    }
 }
