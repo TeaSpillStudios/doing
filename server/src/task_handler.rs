@@ -126,4 +126,29 @@ impl<'a> TaskHandler<'a> {
 
         self.sections.remove(section_name);
     }
+
+    pub fn remove_task(&mut self, task_name: &'a str) {
+        let current_section_name = match &self.current_section {
+            Some(v) => v,
+            None => {
+                log::error!("Please select a section");
+                return;
+            }
+        };
+
+        let section = match self.sections.get_mut(current_section_name.as_str()) {
+            Some(v) => v,
+            None => {
+                log::error!("Could not find section: {}", current_section_name.as_str());
+                return;
+            }
+        };
+
+        if !section.tasks.contains_key(task_name) {
+            log::error!("Could not find task: {task_name}");
+            return;
+        };
+
+        section.tasks.remove(task_name);
+    }
 }
