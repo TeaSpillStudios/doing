@@ -1,5 +1,6 @@
 mod task_handler;
+use task_handler::*;
 
 fn main() {
-    println!("Hello, world!");
+    let mut _task_handler = TaskHandler::default();
 }
