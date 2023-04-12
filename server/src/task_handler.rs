@@ -11,7 +11,7 @@ pub struct Section<'a> {
     pub tasks: HashMap<&'a str, Task>,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Task {
     pub description: String,
     pub completed: bool,
@@ -74,5 +74,25 @@ impl<'a> TaskHandler<'a> {
         };
 
         task.completed = completed;
+    }
+
+    pub fn is_section_completed(&self) -> bool {
+        let current_section_name = match &self.current_section {
+            Some(v) => v,
+            None => {
+                log::error!("Please select a section");
+                return false;
+            }
+        };
+
+        let section = match self.sections.get(current_section_name.as_str()) {
+            Some(v) => v,
+            None => {
+                log::error!("Could not find section: {}", current_section_name.as_str());
+                return false;
+            }
+        };
+
+        return section.tasks.values().any(|t| t.completed != true);
     }
 }
