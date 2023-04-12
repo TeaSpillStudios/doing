@@ -8,7 +8,7 @@ pub struct TaskHandler<'a> {
 
 #[derive(Default)]
 pub struct Section<'a> {
-    tasks: HashMap<&'a str, Task>,
+    pub tasks: HashMap<&'a str, Task>,
 }
 
 #[derive(Default)]
@@ -21,5 +21,29 @@ impl<'a> TaskHandler<'a> {
     pub fn add_section(&mut self, section_name: &'a str) {
         self.sections.insert(section_name, Section::default());
     }
-    // pub fn add_section(&mut self, task_name: &str, task_description: &str, completed_bool) {
+    pub fn add_task(&mut self, task_name: &'a str, task_description: &'a str, completed: bool) {
+        let current_section_name = match &self.current_section {
+            Some(v) => v,
+            None => {
+                log::error!("Please select a section");
+                return;
+            }
+        };
+
+        let section = match self.sections.get_mut(current_section_name.as_str()) {
+            Some(v) => v,
+            None => {
+                log::error!("Could not find section: {}", current_section_name.as_str());
+                return;
+            }
+        };
+
+        section.tasks.insert(
+            task_name,
+            Task {
+                description: task_description.to_string(),
+                completed,
+            },
+        );
+    }
 }
