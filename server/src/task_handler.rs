@@ -151,4 +151,24 @@ impl<'a> TaskHandler<'a> {
 
         section.tasks.remove(task_name);
     }
+
+    pub fn get_tasks(&'a self) -> Option<&HashMap<&'a str, Task>> {
+        let current_section_name = match &self.current_section {
+            Some(v) => v,
+            None => {
+                log::error!("Please select a section");
+                return None;
+            }
+        };
+
+        let section = match self.sections.get(current_section_name.as_str()) {
+            Some(v) => v,
+            None => {
+                log::error!("Could not find section: {}", current_section_name.as_str());
+                return None;
+            }
+        };
+
+        Some(&section.tasks)
+    }
 }
