@@ -13,14 +13,15 @@ pub struct Section<'a> {
 
 #[derive(Default)]
 pub struct Task {
-    description: String,
-    completed: bool,
+    pub description: String,
+    pub completed: bool,
 }
 
 impl<'a> TaskHandler<'a> {
     pub fn add_section(&mut self, section_name: &'a str) {
         self.sections.insert(section_name, Section::default());
     }
+
     pub fn add_task(&mut self, task_name: &'a str, task_description: &'a str, completed: bool) {
         let current_section_name = match &self.current_section {
             Some(v) => v,
@@ -45,5 +46,33 @@ impl<'a> TaskHandler<'a> {
                 completed,
             },
         );
+    }
+
+    pub fn set_task_completion(&mut self, task_name: &'a str, completed: bool) {
+        let current_section_name = match &self.current_section {
+            Some(v) => v,
+            None => {
+                log::error!("Please select a section");
+                return;
+            }
+        };
+
+        let section = match self.sections.get_mut(current_section_name.as_str()) {
+            Some(v) => v,
+            None => {
+                log::error!("Could not find section: {}", current_section_name.as_str());
+                return;
+            }
+        };
+
+        let task = match section.tasks.get_mut(task_name) {
+            Some(v) => v,
+            None => {
+                log::error!("Could not find task: {task_name}");
+                return;
+            }
+        };
+
+        task.completed = completed;
     }
 }
