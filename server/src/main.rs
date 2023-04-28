@@ -1,17 +1,22 @@
-mod task_handler;
-use task_handler::*;
-
+use log::info;
 use std::{
     io::{BufRead, BufReader},
     net::{TcpListener, TcpStream},
 };
+
+mod task_handler;
+use task_handler::*;
+
+const PORT: &str = "2500";
 
 fn main() {
     pretty_env_logger::init();
 
     let mut task_handler = TaskHandler::default();
 
-    let listener = match TcpListener::bind("0.0.0.0:2500") {
+    info!("Listening on port {PORT}");
+
+    let listener = match TcpListener::bind(&format!("0.0.0.0:{PORT}")) {
         Ok(v) => v,
         Err(e) => {
             log::error!("{e}");
@@ -35,9 +40,8 @@ fn main() {
 fn handle_request(mut stream: TcpStream, task_handler: &mut TaskHandler) {
     log::info!("Recieved a connection.");
 
+    // TODO: Add error handling.
     let lines = BufReader::new(stream).lines();
-
-    let command = String::new();
 
     let last_tine = match lines.last() {
         Some(v) => v,
@@ -56,9 +60,15 @@ fn handle_request(mut stream: TcpStream, task_handler: &mut TaskHandler) {
     };
 
     let args: Vec<&str> = last_line.split("|").collect();
-    let command = args[0];
-    let args = args[1..].iter().map(|v| *v).collect::<Vec<&str>>();
 
-    dbg!(command);
-    dbg!(args);
+    handle_command_args(task_handler, args)
+}
+
+fn handle_command_args(task_handler: &mut TaskHandler, args: Vec<&str>) {
+    let command = args[0];
+
+    if args.len() > 2 {
+        println!("3 params detected");
+        println!("{}", args.len());
+    }
 }
