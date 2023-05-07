@@ -15,19 +15,19 @@ const ADDR: &str = "localhost:2500";
 fn setup_test_task_handler(task_handler: &mut MutexGuard<'_, TaskHandler<'_>>) {
     task_handler.add_section("Test");
     task_handler.select_section("Test");
-    task_handler.add_task("Test-task1", "Hi", false);
+    task_handler.add_task("Test-task1".to_owned(), "Hi".to_owned(), false);
 
-    task_handler.add_task("Test-task2", "Hi", false);
-    task_handler.add_task("Test-task3", "Hi", false);
-    task_handler.add_task("Test-task4", "Hi", false);
+    task_handler.add_task("Test-task2".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_task("Test-task3".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_task("Test-task4".to_owned(), "Hi".to_owned(), false);
 
     task_handler.add_section("Testing");
     task_handler.select_section("Testing");
 
-    task_handler.add_task("Test-task5", "Hi", false);
-    task_handler.add_task("Test-task6", "Hi", false);
-    task_handler.add_task("Test-task7", "Hi", false);
-    task_handler.add_task("Test-task8", "Hi", false);
+    task_handler.add_task("Test-task5".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_task("Test-task6".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_task("Test-task7".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_task("Test-task8".to_owned(), "Hi".to_owned(), false);
 }
 
 #[tokio::main]
@@ -44,14 +44,9 @@ async fn main() {
         while let Ok((mut stream, _socket_addr)) = listener.accept().await {
             let task_handler = task_handler.clone();
             tokio::spawn(async move {
-                let map = task_handler.lock().await;
+                info!("New connection");
 
-                println!("Current tasks:");
-
-                for task in map.get_tasks().unwrap() {
-                    println!("    {} - {}", task.0, task.1);
-                }
-
+                let mut map = task_handler.lock().await;
                 let mut buf: [u8; 128] = [0; 128];
 
                 if let Err(e) = stream.read(&mut buf).await {
@@ -64,14 +59,30 @@ async fn main() {
                     .map(|v| v.to_string())
                     .collect();
 
+                info!("Command \"{}\"", &data[0].clone());
+
                 let response = match data[0].as_str() {
                     "list" => {
+                        info!("Listing tasks");
+
                         let task_map = map.get_tasks().unwrap();
 
                         task_map
                             .iter()
                             .map(|v| format!("{} - {}\n", v.0, v.1))
                             .collect::<String>()
+                    }
+
+                    "add_task" => {
+                        info!("Adding a task");
+
+                        map.add_task(
+                            data[1].clone(),
+                            data[2].clone(),
+                            data[3].clone().parse().unwrap(),
+                        );
+
+                        String::from("Succeeded")
                     }
 
                     _ => String::from("Invalid command."),
