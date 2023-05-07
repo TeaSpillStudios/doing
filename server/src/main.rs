@@ -13,21 +13,21 @@ const ADDR: &str = "localhost:2500";
 
 // Add some test tasks.
 fn setup_test_task_handler(task_handler: &mut MutexGuard<'_, TaskHandler<'_>>) {
-    task_handler.add_section("Test");
-    task_handler.select_section("Test");
-    task_handler.add_task("Test-task1".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_section("ToDo");
+    task_handler.select_section("ToDo");
 
-    task_handler.add_task("Test-task2".to_owned(), "Hi".to_owned(), false);
-    task_handler.add_task("Test-task3".to_owned(), "Hi".to_owned(), false);
-    task_handler.add_task("Test-task4".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_task("Test-task1".to_owned(), "A test".to_owned(), false);
+    task_handler.add_task("Test-task2".to_owned(), "Another test".to_owned(), false);
+    task_handler.add_task("Test-task3".to_owned(), "A test task".to_owned(), false);
+    task_handler.add_task("Test-task4".to_owned(), "Task handling ".to_owned(), false);
 
     task_handler.add_section("Testing");
     task_handler.select_section("Testing");
 
-    task_handler.add_task("Test-task5".to_owned(), "Hi".to_owned(), false);
-    task_handler.add_task("Test-task6".to_owned(), "Hi".to_owned(), false);
-    task_handler.add_task("Test-task7".to_owned(), "Hi".to_owned(), false);
-    task_handler.add_task("Test-task8".to_owned(), "Hi".to_owned(), false);
+    task_handler.add_task("Test-task5".to_owned(), "Testing tasks".to_owned(), false);
+    task_handler.add_task("Test-task6".to_owned(), "Do extra things".to_owned(), false);
+    task_handler.add_task("Test-task7".to_owned(), "A test task".to_owned(), false);
+    task_handler.add_task("Test-task8".to_owned(), "Handle tasks".to_owned(), false);
 }
 
 #[tokio::main]
