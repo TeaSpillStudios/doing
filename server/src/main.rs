@@ -1,5 +1,8 @@
 use std::sync::Arc;
-use tokio::sync::{Mutex, MutexGuard};
+use tokio::{
+    io::AsyncReadExt,
+    sync::{Mutex, MutexGuard},
+};
 
 use server::tasks::TaskHandler;
 use tokio::{io::AsyncWriteExt, net::TcpListener};
@@ -10,6 +13,7 @@ const ADDR: &str = "localhost:2500";
 
 // Add some test tasks.
 fn setup_test_task_handler(task_handler: &mut MutexGuard<'_, TaskHandler<'_>>) {
+    task_handler.add_section("Test");
     task_handler.select_section("Test");
     task_handler.add_task("Test-task1", "Hi", false);
 
@@ -48,12 +52,34 @@ async fn main() {
                     println!("    {} - {}", task.0, task.1);
                 }
 
-                match stream.write(b"Testing").await {
-                    Ok(_) => {}
-                    Err(e) => {
-                        error!("Error writing to stream: {e}");
-                        return;
+                let mut buf: [u8; 128] = [0; 128];
+
+                if let Err(e) = stream.read(&mut buf).await {
+                    error!("Error reading stream: {e}");
+                    return;
+                }
+
+                let data: Vec<String> = String::from_utf8_lossy(&buf)
+                    .split('|')
+                    .map(|v| v.to_string())
+                    .collect();
+
+                let response = match data[0].as_str() {
+                    "list" => {
+                        let task_map = map.get_tasks().unwrap();
+
+                        task_map
+                            .iter()
+                            .map(|v| format!("{} - {}\n", v.0, v.1))
+                            .collect::<String>()
                     }
+
+                    _ => String::from("Invalid command."),
+                };
+
+                if let Err(e) = stream.write(response.as_bytes()).await {
+                    error!("Error writing to stream: {e}");
+                    return;
                 }
             });
         }
