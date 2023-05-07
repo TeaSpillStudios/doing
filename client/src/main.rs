@@ -1,8 +1,6 @@
 use std::{
-    io::{Read, Write},
+    io::{stdin, stdout, Read, Write},
     net::{Shutdown, TcpStream},
-    thread,
-    time::Duration,
 };
 use tracing::{error, info};
 
@@ -33,11 +31,28 @@ fn execute_command(command: &str) -> String {
 fn main() {
     tracing_subscriber::fmt().without_time().init();
 
-    let response = execute_command("list|test");
-    info!("Response: \n{}", response);
+    loop {
+        let mut buf = String::new();
+        print!("Command: ");
 
-    thread::sleep(Duration::from_millis(100));
+        stdout().flush().unwrap();
+        stdin().read_line(&mut buf).unwrap();
 
-    let response = execute_command("list|test");
-    info!("Response: \n{}", response);
+        let buf = buf.trim();
+
+        if buf == String::from("break") {
+            break;
+        }
+
+        let response = execute_command(&buf);
+        info!("Response: \n{}", response);
+    }
+
+    // let response = execute_command("list|test");
+    // info!("Response: \n{}", response);
+
+    // thread::sleep(Duration::from_millis(100));
+
+    // let response = execute_command("list|test");
+    // info!("Response: \n{}", response);
 }
