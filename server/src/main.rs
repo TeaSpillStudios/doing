@@ -1,21 +1,9 @@
-// use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use crate::task_handler::{Task, TaskHandler};
+use server::tasks::TaskHandler;
 use tokio::net::TcpListener;
 
 use log::{error, info};
 
-// use log::info;
-
-mod task_handler;
-// use task_handler::{Task, TaskHandler};
-
 const ADDR: &str = "localhost:2500";
-
-impl std::fmt::Display for Task {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.description)
-    }
-}
 
 // Add some test tasks.
 fn setup_test_task_handler(task_handler: &mut TaskHandler) {
