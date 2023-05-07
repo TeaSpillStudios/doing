@@ -38,6 +38,22 @@ pub mod tasks {
             };
         }
 
+        pub fn add_and_select_section(&mut self, section_name: &'a str) {
+            match self.sections.contains_key(section_name) {
+                true => {
+                    error!("Could not add section, already exists: {section_name}");
+                    return;
+                }
+
+                false => self.sections.insert(section_name, Section::default()),
+            };
+
+            match self.sections.contains_key(section_name) {
+                true => self.current_section = Some(section_name.to_string()),
+                false => error!("Could not find section: {}", section_name),
+            }
+        }
+
         pub fn add_task(&mut self, task_name: String, task_description: String, completed: bool) {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
