@@ -73,13 +73,9 @@ async fn main() {
                             .collect::<String>()
                     }
 
-                    "list" => {
-                        let task_map = map.get_tasks().unwrap();
-
-                        task_map
-                            .iter()
-                            .map(|v| format!("{} - {}\n", v.0, v.1))
-                            .collect::<String>()
+                    "add_and_select_section" => {
+                        map.add_and_select_section(data[1].clone());
+                        String::from("Succeeded")
                     }
 
                     "add_task" => {
@@ -90,6 +86,37 @@ async fn main() {
                         );
 
                         String::from("Succeeded")
+                    }
+
+                    "set_task_completion" => {
+                        map.set_task_completion(data[1].clone(), data[2].parse().unwrap());
+                        String::from("Succeeded")
+                    }
+
+                    "is_section_completed" => map.is_section_completed().to_string(),
+
+                    "select_section" => {
+                        map.select_section(data[1].clone());
+                        String::from("Succeeded")
+                    }
+
+                    "remove_section" => {
+                        map.remove_section(data[1].clone());
+                        String::from("Succeeded")
+                    }
+
+                    "remove_task" => {
+                        map.remove_task(data[1].clone());
+                        String::from("Succeeded")
+                    }
+
+                    "list" => {
+                        let task_map = map.get_tasks().unwrap();
+
+                        task_map
+                            .iter()
+                            .map(|v| format!("{} - {}\n", v.0, v.1))
+                            .collect::<String>()
                     }
 
                     _ => format!("Invalid command: \"{}\"", data[0]),
