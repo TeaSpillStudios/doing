@@ -4,8 +4,8 @@ pub mod tasks {
     use tracing::error;
 
     #[derive(Default, Debug)]
-    pub struct TaskHandler<'a> {
-        sections: HashMap<&'a str, Section>,
+    pub struct TaskHandler {
+        sections: HashMap<String, Section>,
         current_section: Option<String>,
     }
 
@@ -26,9 +26,9 @@ pub mod tasks {
         }
     }
 
-    impl<'a> TaskHandler<'a> {
-        pub fn add_section(&mut self, section_name: &'a str) {
-            match self.sections.contains_key(section_name) {
+    impl TaskHandler {
+        pub fn add_section(&mut self, section_name: String) {
+            match self.sections.contains_key(&section_name) {
                 true => {
                     error!("Could not add section, already exists: {section_name}");
                     return;
@@ -38,17 +38,26 @@ pub mod tasks {
             };
         }
 
-        pub fn add_and_select_section(&mut self, section_name: &'a str) {
-            match self.sections.contains_key(section_name) {
+        pub fn list_sections(&self) -> Vec<String> {
+            self.sections
+                .iter()
+                .map(|v| format!("{}\n", v.0))
+                .collect::<Vec<String>>()
+        }
+
+        pub fn add_and_select_section(&mut self, section_name: String) {
+            match self.sections.contains_key(&section_name) {
                 true => {
                     error!("Could not add section, already exists: {section_name}");
                     return;
                 }
 
-                false => self.sections.insert(section_name, Section::default()),
+                false => self
+                    .sections
+                    .insert(section_name.clone(), Section::default()),
             };
 
-            match self.sections.contains_key(section_name) {
+            match self.sections.contains_key(&section_name) {
                 true => self.current_section = Some(section_name.to_string()),
                 false => error!("Could not find section: {}", section_name),
             }
@@ -80,7 +89,7 @@ pub mod tasks {
             );
         }
 
-        pub fn set_task_completion(&mut self, task_name: &'a str, completed: bool) {
+        pub fn set_task_completion(&mut self, task_name: String, completed: bool) {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
@@ -97,7 +106,7 @@ pub mod tasks {
                 }
             };
 
-            let task = match section.tasks.get_mut(task_name) {
+            let task = match section.tasks.get_mut(&task_name) {
                 Some(v) => v,
                 None => {
                     error!("Could not find task: {task_name}");
@@ -128,14 +137,14 @@ pub mod tasks {
             return section.tasks.values().any(|t| t.completed != true);
         }
 
-        pub fn select_section(&mut self, section_name: &'a str) {
-            match self.sections.contains_key(section_name) {
+        pub fn select_section(&mut self, section_name: String) {
+            match self.sections.contains_key(&section_name) {
                 true => self.current_section = Some(section_name.to_string()),
                 false => error!("Could not find section: {}", section_name),
             }
         }
 
-        pub fn remove_section(&mut self, section_name: &'a str) {
+        pub fn remove_section(&mut self, section_name: String) {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
@@ -149,10 +158,10 @@ pub mod tasks {
                 return;
             };
 
-            self.sections.remove(section_name);
+            self.sections.remove(&section_name);
         }
 
-        pub fn remove_task(&mut self, task_name: &'a str) {
+        pub fn remove_task(&mut self, task_name: String) {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
@@ -169,15 +178,15 @@ pub mod tasks {
                 }
             };
 
-            if !section.tasks.contains_key(task_name) {
+            if !section.tasks.contains_key(&task_name) {
                 error!("Could not find task: {task_name}");
                 return;
             };
 
-            section.tasks.remove(task_name);
+            section.tasks.remove(&task_name);
         }
 
-        pub fn get_tasks(&'a self) -> Option<&HashMap<String, Task>> {
+        pub fn get_tasks(&self) -> Option<&HashMap<String, Task>> {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
