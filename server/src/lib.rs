@@ -3,13 +3,13 @@ pub mod tasks {
 
     #[derive(Default, Debug)]
     pub struct TaskHandler<'a> {
-        sections: HashMap<&'a str, Section<'a>>,
+        sections: HashMap<&'a str, Section>,
         current_section: Option<String>,
     }
 
     #[derive(Default, Debug)]
-    pub struct Section<'a> {
-        pub tasks: HashMap<&'a str, Task>,
+    pub struct Section {
+        pub tasks: HashMap<String, Task>,
     }
 
     #[derive(Default, Debug)]
@@ -36,7 +36,7 @@ pub mod tasks {
             };
         }
 
-        pub fn add_task(&mut self, task_name: &'a str, task_description: &'a str, completed: bool) {
+        pub fn add_task(&mut self, task_name: String, task_description: String, completed: bool) {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
@@ -159,7 +159,7 @@ pub mod tasks {
             section.tasks.remove(task_name);
         }
 
-        pub fn get_tasks(&'a self) -> Option<&HashMap<&'a str, Task>> {
+        pub fn get_tasks(&'a self) -> Option<&HashMap<String, Task>> {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
