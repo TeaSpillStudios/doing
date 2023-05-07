@@ -1,6 +1,8 @@
 pub mod tasks {
     use std::collections::HashMap;
 
+    use tracing::error;
+
     #[derive(Default, Debug)]
     pub struct TaskHandler<'a> {
         sections: HashMap<&'a str, Section>,
@@ -28,7 +30,7 @@ pub mod tasks {
         pub fn add_section(&mut self, section_name: &'a str) {
             match self.sections.contains_key(section_name) {
                 true => {
-                    log::error!("Could not add section, already exists: {section_name}");
+                    error!("Could not add section, already exists: {section_name}");
                     return;
                 }
 
@@ -40,7 +42,7 @@ pub mod tasks {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
-                    log::error!("Please select a section");
+                    error!("Please select a section");
                     return;
                 }
             };
@@ -48,7 +50,7 @@ pub mod tasks {
             let section = match self.sections.get_mut(current_section_name.as_str()) {
                 Some(v) => v,
                 None => {
-                    log::error!("Could not find section: {}", current_section_name.as_str());
+                    error!("Could not find section: {}", current_section_name.as_str());
                     return;
                 }
             };
@@ -66,7 +68,7 @@ pub mod tasks {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
-                    log::error!("Please select a section");
+                    error!("Please select a section");
                     return;
                 }
             };
@@ -74,7 +76,7 @@ pub mod tasks {
             let section = match self.sections.get_mut(current_section_name.as_str()) {
                 Some(v) => v,
                 None => {
-                    log::error!("Could not find section: {}", current_section_name.as_str());
+                    error!("Could not find section: {}", current_section_name.as_str());
                     return;
                 }
             };
@@ -82,7 +84,7 @@ pub mod tasks {
             let task = match section.tasks.get_mut(task_name) {
                 Some(v) => v,
                 None => {
-                    log::error!("Could not find task: {task_name}");
+                    error!("Could not find task: {task_name}");
                     return;
                 }
             };
@@ -94,7 +96,7 @@ pub mod tasks {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
-                    log::error!("Please select a section");
+                    error!("Please select a section");
                     return false;
                 }
             };
@@ -102,7 +104,7 @@ pub mod tasks {
             let section = match self.sections.get(current_section_name.as_str()) {
                 Some(v) => v,
                 None => {
-                    log::error!("Could not find section: {}", current_section_name.as_str());
+                    error!("Could not find section: {}", current_section_name.as_str());
                     return false;
                 }
             };
@@ -113,7 +115,7 @@ pub mod tasks {
         pub fn select_section(&mut self, section_name: &'a str) {
             match self.sections.contains_key(section_name) {
                 true => self.current_section = Some(section_name.to_string()),
-                false => log::error!("Could not find section: {}", section_name),
+                false => error!("Could not find section: {}", section_name),
             }
         }
 
@@ -121,13 +123,13 @@ pub mod tasks {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
-                    log::error!("Please select a section");
+                    error!("Please select a section");
                     return;
                 }
             };
 
             if self.sections.get(current_section_name.as_str()).is_none() {
-                log::error!("Could not find section: {}", current_section_name.as_str());
+                error!("Could not find section: {}", current_section_name.as_str());
                 return;
             };
 
@@ -138,7 +140,7 @@ pub mod tasks {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
-                    log::error!("Please select a section");
+                    error!("Please select a section");
                     return;
                 }
             };
@@ -146,13 +148,13 @@ pub mod tasks {
             let section = match self.sections.get_mut(current_section_name.as_str()) {
                 Some(v) => v,
                 None => {
-                    log::error!("Could not find section: {}", current_section_name.as_str());
+                    error!("Could not find section: {}", current_section_name.as_str());
                     return;
                 }
             };
 
             if !section.tasks.contains_key(task_name) {
-                log::error!("Could not find task: {task_name}");
+                error!("Could not find task: {task_name}");
                 return;
             };
 
@@ -163,7 +165,7 @@ pub mod tasks {
             let current_section_name = match &self.current_section {
                 Some(v) => v,
                 None => {
-                    log::error!("Please select a section");
+                    error!("Please select a section");
                     return None;
                 }
             };
@@ -171,7 +173,7 @@ pub mod tasks {
             let section = match self.sections.get(current_section_name.as_str()) {
                 Some(v) => v,
                 None => {
-                    log::error!("Could not find section: {}", current_section_name.as_str());
+                    error!("Could not find section: {}", current_section_name.as_str());
                     return None;
                 }
             };
