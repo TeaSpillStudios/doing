@@ -7,7 +7,7 @@ use tokio::{
 use server::tasks::TaskHandler;
 use tokio::{io::AsyncWriteExt, net::TcpListener};
 
-use log::{error, info};
+use tracing::{error, info};
 
 const ADDR: &str = "localhost:2500";
 
@@ -32,7 +32,7 @@ fn setup_test_task_handler(task_handler: &mut MutexGuard<'_, TaskHandler<'_>>) {
 
 #[tokio::main]
 async fn main() {
-    pretty_env_logger::init();
+    tracing_subscriber::fmt().without_time().init();
 
     let task_handler = Arc::new(Mutex::new(TaskHandler::default())).clone();
 
