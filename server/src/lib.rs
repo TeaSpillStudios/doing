@@ -1,18 +1,18 @@
 pub mod tasks {
     use std::collections::HashMap;
 
-    #[derive(Default)]
+    #[derive(Default, Debug)]
     pub struct TaskHandler<'a> {
         sections: HashMap<&'a str, Section<'a>>,
         current_section: Option<String>,
     }
 
-    #[derive(Default)]
+    #[derive(Default, Debug)]
     pub struct Section<'a> {
         pub tasks: HashMap<&'a str, Task>,
     }
 
-    #[derive(Default)]
+    #[derive(Default, Debug)]
     pub struct Task {
         pub description: String,
         pub completed: bool,
