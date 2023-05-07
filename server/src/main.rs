@@ -12,15 +12,15 @@ use tracing::{error, info};
 const ADDR: &str = "localhost:2500";
 
 // Add some test tasks.
-fn setup_test_task_handler(task_handler: &mut MutexGuard<'_, TaskHandler<'_>>) {
-    task_handler.add_and_select_section("ToDo");
+fn setup_test_task_handler(task_handler: &mut MutexGuard<'_, TaskHandler>) {
+    task_handler.add_and_select_section("ToDo".to_owned());
 
     task_handler.add_task("Test-task1".to_owned(), "A test".to_owned(), false);
     task_handler.add_task("Test-task2".to_owned(), "Another test".to_owned(), false);
     task_handler.add_task("Test-task3".to_owned(), "A test task".to_owned(), false);
     task_handler.add_task("Test-task4".to_owned(), "Task handling ".to_owned(), false);
 
-    task_handler.add_and_select_section("Testing");
+    task_handler.add_and_select_section("Testing".to_owned());
 
     task_handler.add_task("Test-task5".to_owned(), "Testing tasks".to_owned(), false);
     task_handler.add_task("Test-task6".to_owned(), "Do extra things".to_owned(), false);
@@ -41,9 +41,8 @@ async fn main() {
     let server = async move {
         while let Ok((mut stream, _socket_addr)) = listener.accept().await {
             let task_handler = task_handler.clone();
-            tokio::spawn(async move {
-                info!("New connection");
 
+            tokio::spawn(async move {
                 let mut map = task_handler.lock().await;
                 let mut buf: [u8; 128] = [0; 128];
 
@@ -54,15 +53,27 @@ async fn main() {
 
                 let data: Vec<String> = String::from_utf8_lossy(&buf)
                     .split('|')
-                    .map(|v| v.to_string())
+                    .map(|v| v.trim_matches(char::from(0)).to_string())
                     .collect();
 
-                info!("Command \"{}\"", &data[0].clone());
+                info!("Got command \"{}\"", &data[0].as_str());
 
                 let response = match data[0].as_str() {
-                    "list" => {
-                        info!("Listing tasks");
+                    "add_section" => {
+                        map.add_section(data[1].clone());
+                        String::from("Succeeded")
+                    }
 
+                    "list_sections" => {
+                        info!("Listing sections");
+
+                        map.list_sections()
+                            .iter()
+                            .map(|v| format!("{v}"))
+                            .collect::<String>()
+                    }
+
+                    "list" => {
                         let task_map = map.get_tasks().unwrap();
 
                         task_map
@@ -72,8 +83,6 @@ async fn main() {
                     }
 
                     "add_task" => {
-                        info!("Adding a task");
-
                         map.add_task(
                             data[1].clone(),
                             data[2].clone(),
@@ -83,7 +92,7 @@ async fn main() {
                         String::from("Succeeded")
                     }
 
-                    _ => String::from("Invalid command."),
+                    _ => format!("Invalid command: \"{}\"", data[0]),
                 };
 
                 if let Err(e) = stream.write(response.as_bytes()).await {
